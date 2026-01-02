@@ -892,19 +892,25 @@
 ///@{
 namespace Qore::Sysconf::Sysconf;
 
-//! TODO/FIXME
+//! Returned when there is no defined limit for a configurable parameter
 const SC_NO_LIMIT = -1;
 
-//! Sysconf wrapper for _SC_CLK_TCK
+//! Sysconf wrapper for _SC_ARG_MAX: maximum length of arguments to exec functions
+const SC_ARG_MAX = _SC_ARG_MAX;
+
+//! Sysconf wrapper for _SC_CHILD_MAX: maximum number of simultaneous processes per user
+const SC_CHILD_MAX = _SC_CHILD_MAX;
+
+//! Sysconf wrapper for _SC_CLK_TCK: number of clock ticks per second
 const SC_CLK_TCK = _SC_CLK_TCK;
 
-//! Sysconf wrapper for _SC_NGROUPS_MAX
+//! Sysconf wrapper for _SC_NGROUPS_MAX: maximum number of supplementary groups per user
 const SC_NGROUPS_MAX = _SC_NGROUPS_MAX;
 
-//! Sysconf wrapper for _SC_OPEN_MAX
+//! Sysconf wrapper for _SC_OPEN_MAX: maximum number of open files per process
 const SC_OPEN_MAX = _SC_OPEN_MAX;
 
-//! Sysconf wrapper for _SC_STREAM_MAX
+//! Sysconf wrapper for _SC_STREAM_MAX: maximum number of streams per process
 const SC_STREAM_MAX = _SC_STREAM_MAX;
 
 //! Sysconf wrapper for _SC_TZNAME_MAX
@@ -979,10 +985,10 @@ const SC_MQ_PRIO_MAX = _SC_MQ_PRIO_MAX;
 //! Sysconf wrapper for _SC_VERSION
 const SC_VERSION = _SC_VERSION;
 
-//! Sysconf wrapper for _SC_PAGESIZE
+//! Sysconf wrapper for _SC_PAGESIZE: system page size in bytes
 const SC_PAGESIZE = _SC_PAGESIZE;
 
-//! Sysconf wrapper for _SC_PAGE_SIZE
+//! Sysconf wrapper for _SC_PAGE_SIZE: system page size in bytes (same as SC_PAGESIZE)
 const SC_PAGE_SIZE = _SC_PAGE_SIZE;
 
 //! Sysconf wrapper for _SC_RTSIG_MAX
@@ -1144,16 +1150,16 @@ const SC_THREAD_PRIO_PROTECT = _SC_THREAD_PRIO_PROTECT;
 //! Sysconf wrapper for _SC_THREAD_PROCESS_SHARED
 const SC_THREAD_PROCESS_SHARED = _SC_THREAD_PROCESS_SHARED;
 
-//! Sysconf wrapper for _SC_NPROCESSORS_CONF
+//! Sysconf wrapper for _SC_NPROCESSORS_CONF: number of processors configured
 const SC_NPROCESSORS_CONF = _SC_NPROCESSORS_CONF;
 
-//! Sysconf wrapper for _SC_NPROCESSORS_ONLN
+//! Sysconf wrapper for _SC_NPROCESSORS_ONLN: number of processors currently online
 const SC_NPROCESSORS_ONLN = _SC_NPROCESSORS_ONLN;
 
-//! Sysconf wrapper for _SC_PHYS_PAGES
+//! Sysconf wrapper for _SC_PHYS_PAGES: total number of physical memory pages
 const SC_PHYS_PAGES = _SC_PHYS_PAGES;
 
-//! Sysconf wrapper for _SC_AVPHYS_PAGES
+//! Sysconf wrapper for _SC_AVPHYS_PAGES: number of available physical memory pages
 const SC_AVPHYS_PAGES = _SC_AVPHYS_PAGES;
 
 //! Sysconf wrapper for _SC_ATEXIT_MAX

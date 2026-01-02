@@ -1,20 +1,78 @@
+Qore sysconf Module
+===================
 
-* BUILD INSTRUCTIONS *
+The sysconf module provides Qore with access to runtime system configuration
+information from the underlying operating system. The functionality wraps
+standard C library system configuration functions.
+
+Functions provided:
+- sysconf(): Get system-wide runtime parameters (CPU count, memory limits, etc.)
+- confstr(): Get string-valued configuration parameters (paths, versions, etc.)
+- pathconf(): Query file system limits for specific paths
+
+Quick Start
+-----------
+
+    %requires sysconf
+
+    # Get the number of online CPUs
+    printf("CPUs online: %d\n", sysconf(Sysconf::SC_NPROCESSORS_ONLN));
+
+    # Get system page size
+    printf("Page size: %d bytes\n", sysconf(Sysconf::SC_PAGESIZE));
+
+    # Get maximum filename length for a path
+    printf("Max filename length: %d\n", pathconf("/tmp", Pathconf::PC_NAME_MAX));
+
+    # Get the default PATH
+    printf("Default PATH: %s\n", confstr(Confstr::CS_PATH));
+
+Build Instructions
+------------------
 
 Requirements:
- - Qore development environment (lib and headers)
- - Cmake
- - (optional) DOxygen
+ - Qore 1.12.4+ development environment (lib and headers)
+ - CMake 2.8.12+
+ - C++11 compatible compiler
+ - (optional) Doxygen for documentation
 
-Use so called "out of source" build
+Use "out of source" build:
 
- - mkdir build   (in module directory)
- - cd build
- - cmake -DCMAKE_INSTALL_PREFIX=/path/to/install ..   (if there is not -DCMAKE_INSTALL_PREFIX specified, the Qore module dire is used)
- - make
- - cross fingers
- - make install
+    mkdir build
+    cd build
+    cmake -DCMAKE_INSTALL_PREFIX=/path/to/install ..
+    make
+    make install
 
-Some tests are located in "test" directory.
+If -DCMAKE_INSTALL_PREFIX is not specified, the Qore module directory is used.
 
+Running Tests
+-------------
 
+After building:
+
+    cd build
+    make test
+
+Or run the test directly:
+
+    qore test/sysconf.qtest
+
+Documentation
+-------------
+
+Full API documentation is generated with Doxygen:
+
+    cd build
+    make docs
+
+License
+-------
+
+This module is released under the LGPL 2.1 license.
+See the COPYING file for the full license text.
+
+Repository
+----------
+
+https://github.com/qoretechnologies/module-sysconf

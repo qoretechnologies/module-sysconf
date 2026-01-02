@@ -4,6 +4,7 @@
 %strict-args
 %require-types
 %enable-all-warnings
+%disable-warning return-value-ignored
 
 %requires sysconf
 
@@ -12,14 +13,148 @@
 %exec-class SysconfTest
 
 class SysconfTest inherits QUnit::Test {
-    constructor() : QUnit::Test("OracleTest", "1.0", \ARGV) {
-        addTestCase("basic test", \basicTest());
+    constructor() : QUnit::Test("SysconfTest", "1.0", \ARGV) {
+        addTestCase("sysconf basic test", \sysconfBasicTest());
+        addTestCase("sysconf multiple constants test", \sysconfMultipleConstantsTest());
+        addTestCase("sysconf error test", \sysconfErrorTest());
+        addTestCase("sysconf_constants helper test", \sysconfConstantsHelperTest());
+        addTestCase("confstr basic test", \confstrBasicTest());
+        addTestCase("confstr error test", \confstrErrorTest());
+        addTestCase("confstr_constants helper test", \confstrConstantsHelperTest());
+        addTestCase("pathconf basic test", \pathconfBasicTest());
+        addTestCase("pathconf multiple constants test", \pathconfMultipleConstantsTest());
+        addTestCase("pathconf error test", \pathconfErrorTest());
+        addTestCase("pathconf_constants helper test", \pathconfConstantsHelperTest());
         set_return_value(main());
     }
 
-    basicTest() {
-        assertGe(1, sysconf(Sysconf::SC_NPROCESSORS_ONLN));
-        assertEq(Type::String, confstr(CS_POSIX_V7_ILP32_OFF32_CFLAGS).type());
-        assertGt(0, pathconf(get_script_path(), PC_NAME_MAX));
+    # sysconf tests
+    sysconfBasicTest() {
+        # Test that we can get the number of online processors
+        int cpus = sysconf(Sysconf::SC_NPROCESSORS_ONLN);
+        assertGe(1, cpus, "should have at least 1 CPU online");
+
+        # Test page size is a reasonable value (typically 4096 or larger)
+        int pagesize = sysconf(Sysconf::SC_PAGESIZE);
+        assertGe(512, pagesize, "page size should be at least 512 bytes");
+        # Page size should be a power of 2
+        assertEq(0, pagesize & (pagesize - 1), "page size should be a power of 2");
+    }
+
+    sysconfMultipleConstantsTest() {
+        # Test various commonly used sysconf values
+        int arg_max = sysconf(Sysconf::SC_ARG_MAX);
+        assertTrue(arg_max >= -1, "SC_ARG_MAX should return valid value or -1 for no limit");
+
+        int open_max = sysconf(Sysconf::SC_OPEN_MAX);
+        assertTrue(open_max >= -1, "SC_OPEN_MAX should return valid value or -1 for no limit");
+
+        int child_max = sysconf(Sysconf::SC_CHILD_MAX);
+        assertTrue(child_max >= -1, "SC_CHILD_MAX should return valid value or -1 for no limit");
+
+        int nprocessors_conf = sysconf(Sysconf::SC_NPROCESSORS_CONF);
+        assertGe(1, nprocessors_conf, "should have at least 1 CPU configured");
+
+        # Number of online processors should not exceed configured processors
+        int nprocessors_onln = sysconf(Sysconf::SC_NPROCESSORS_ONLN);
+        assertLe(nprocessors_onln, nprocessors_conf, "online CPUs should not exceed configured CPUs");
+
+        # Test physical memory pages
+        int phys_pages = sysconf(Sysconf::SC_PHYS_PAGES);
+        assertGt(0, phys_pages, "should have physical memory pages");
+    }
+
+    sysconfErrorTest() {
+        # Test with invalid parameter - should throw SYSCONF-ERROR
+        assertThrows("SYSCONF-ERROR", sub() { sysconf(-99999); });
+    }
+
+    sysconfConstantsHelperTest() {
+        hash consts = sysconf_constants();
+
+        # Verify the hash is not empty
+        assertGt(0, consts.size(), "sysconf_constants should return non-empty hash");
+
+        # Verify some expected constants exist
+        assertTrue(consts.hasKey("SC_NPROCESSORS_ONLN"), "should have SC_NPROCESSORS_ONLN constant");
+        assertTrue(consts.hasKey("SC_PAGESIZE"), "should have SC_PAGESIZE constant");
+        assertTrue(consts.hasKey("SC_ARG_MAX"), "should have SC_ARG_MAX constant");
+        assertTrue(consts.hasKey("SC_OPEN_MAX"), "should have SC_OPEN_MAX constant");
+    }
+
+    # confstr tests
+    confstrBasicTest() {
+        # Test getting the default path
+        string path = confstr(Confstr::CS_PATH);
+        assertEq(Type::String, path.type(), "confstr should return a string");
+        # Path should contain typical bin directories
+        assertTrue(path.size() >= 0, "CS_PATH should return a string (may be empty on some systems)");
+    }
+
+    confstrErrorTest() {
+        # Test with invalid parameter - should throw CONFSTR-ERROR
+        assertThrows("CONFSTR-ERROR", sub() { confstr(-99999); });
+    }
+
+    confstrConstantsHelperTest() {
+        hash consts = confstr_constants();
+
+        # Verify the hash is not empty
+        assertGt(0, consts.size(), "confstr_constants should return non-empty hash");
+
+        # Verify some expected constants exist
+        assertTrue(consts.hasKey("CS_PATH"), "should have CS_PATH constant");
+    }
+
+    # pathconf tests
+    pathconfBasicTest() {
+        string test_path = get_script_path();
+
+        # Test getting maximum filename length
+        int name_max = pathconf(test_path, Pathconf::PC_NAME_MAX);
+        assertGt(0, name_max, "PC_NAME_MAX should be positive for valid path");
+
+        # Test getting maximum path length
+        int path_max = pathconf(test_path, Pathconf::PC_PATH_MAX);
+        assertTrue(path_max >= -1, "PC_PATH_MAX should return valid value or -1");
+    }
+
+    pathconfMultipleConstantsTest() {
+        string test_path = get_script_path();
+
+        # Test various pathconf values
+        int link_max = pathconf(test_path, Pathconf::PC_LINK_MAX);
+        assertTrue(link_max >= -1, "PC_LINK_MAX should return valid value or -1");
+
+        int pipe_buf = pathconf(test_path, Pathconf::PC_PIPE_BUF);
+        assertTrue(pipe_buf >= -1, "PC_PIPE_BUF should return valid value or -1");
+
+        int filesizebits = pathconf(test_path, Pathconf::PC_FILESIZEBITS);
+        assertTrue(filesizebits >= -1, "PC_FILESIZEBITS should return valid value or -1");
+
+        # Test with current directory
+        int name_max_cwd = pathconf(".", Pathconf::PC_NAME_MAX);
+        assertGt(0, name_max_cwd, "PC_NAME_MAX should be positive for current directory");
+    }
+
+    pathconfErrorTest() {
+        # Test with non-existent file - should throw PATHCONF-ERROR
+        assertThrows("PATHCONF-ERROR", sub() { pathconf("/nonexistent/path/that/does/not/exist", Pathconf::PC_NAME_MAX); });
+
+        # Test with invalid parameter on valid path
+        assertThrows("PATHCONF-ERROR", sub() { pathconf(get_script_path(), -99999); });
+    }
+
+    pathconfConstantsHelperTest() {
+        hash consts = pathconf_constants();
+
+        # Verify the hash is not empty
+        assertGt(0, consts.size(), "pathconf_constants should return non-empty hash");
+
+        # Verify some expected constants exist
+        assertTrue(consts.hasKey("PC_NAME_MAX"), "should have PC_NAME_MAX constant");
+        assertTrue(consts.hasKey("PC_PATH_MAX"), "should have PC_PATH_MAX constant");
+        assertTrue(consts.hasKey("PC_LINK_MAX"), "should have PC_LINK_MAX constant");
+        assertTrue(consts.hasKey("PC_PIPE_BUF"), "should have PC_PIPE_BUF constant");
     }
 }

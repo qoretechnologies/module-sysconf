@@ -38,7 +38,7 @@
 
     This module is released under the <a href="http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html">LGPL 2.1</a>
     and is tagged as such in the module's header (meaning it can be loaded unconditionally regardless of how
-    the %Qore library was initialized). This version of the module requires Qore 0.8.0+ to compile and run.
+    the %Qore library was initialized). This version of the module requires Qore 1.12.4+ to compile and run.
 
     To use the module in a %Qore script, use the \c %%requires directive as follows:
     @code %requires sysconf @endcode
@@ -153,27 +153,28 @@ hash<string, int> sysconf_constants() [flags=CONSTANT] {
 
     @return A string with the requested value
 
-    @throw CONFSTR-ERRO
+    @throw CONFSTR-ERROR
  */
 string confstr(int param) [flags=RET_VALUE_ONLY] {
 #ifdef HAVE_CONFSTR
-    size_t len = confstr (param, NULL, 0);
-    if (!len || errno != 0)
-    {
+    errno = 0;
+    size_t len = confstr(param, NULL, 0);
+    if (!len || errno != 0) {
         xsink->raiseErrnoException("CONFSTR-ERROR", errno, "confstr(%d) failed", param);
         return 0;
     }
 
     SimpleRefHolder<QoreStringNode> rv(new QoreStringNode);
-    // this reserves len + 1 bytes in the string
+    // reserve len bytes (confstr returns size including null terminator)
     rv->reserve(len);
     // theoretically there should be no error here, but just in case we have additional error handling
     errno = 0;
-    if (!confstr(param, (char*)rv->getBuffer(), len + 1) || errno) {
+    if (!confstr(param, (char*)rv->getBuffer(), len) || errno) {
         xsink->raiseErrnoException("CONFSTR-ERROR", errno, "confstr(%d) failed", param);
         return 0;
     }
-    rv->terminate(len);
+    // len includes null terminator, so actual string length is len - 1
+    rv->terminate(len - 1);
     return rv.release();
 
 #else

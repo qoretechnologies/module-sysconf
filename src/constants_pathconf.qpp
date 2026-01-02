@@ -112,67 +112,67 @@
 ///@{
 namespace Qore::Sysconf::Pathconf;
 
-//! Confstr wrapper for _PC_LINK_MAX
+//! Pathconf wrapper for _PC_LINK_MAX: maximum number of links to a file
 const PC_LINK_MAX = _PC_LINK_MAX;
 
-//! Confstr wrapper for _PC_MAX_CANON
+//! Pathconf wrapper for _PC_MAX_CANON: maximum length of a formatted input line
 const PC_MAX_CANON = _PC_MAX_CANON;
 
-//! Confstr wrapper for _PC_MAX_INPUT
+//! Pathconf wrapper for _PC_MAX_INPUT: maximum length of an input line
 const PC_MAX_INPUT = _PC_MAX_INPUT;
 
-//! Confstr wrapper for _PC_NAME_MAX
+//! Pathconf wrapper for _PC_NAME_MAX: maximum length of a filename
 const PC_NAME_MAX = _PC_NAME_MAX;
 
-//! Confstr wrapper for _PC_PATH_MAX
+//! Pathconf wrapper for _PC_PATH_MAX: maximum length of a pathname
 const PC_PATH_MAX = _PC_PATH_MAX;
 
-//! Confstr wrapper for _PC_PIPE_BUF
+//! Pathconf wrapper for _PC_PIPE_BUF: size of the pipe buffer
 const PC_PIPE_BUF = _PC_PIPE_BUF;
 
-//! Confstr wrapper for _PC_CHOWN_RESTRICTED
+//! Pathconf wrapper for _PC_CHOWN_RESTRICTED: chown restricted to root
 const PC_CHOWN_RESTRICTED = _PC_CHOWN_RESTRICTED;
 
-//! Confstr wrapper for _PC_NO_TRUNC
+//! Pathconf wrapper for _PC_NO_TRUNC: filenames are not truncated
 const PC_NO_TRUNC = _PC_NO_TRUNC;
 
-//! Confstr wrapper for _PC_VDISABLE
+//! Pathconf wrapper for _PC_VDISABLE: terminal special characters can be disabled
 const PC_VDISABLE = _PC_VDISABLE;
 
-//! Confstr wrapper for _PC_SYNC_IO
+//! Pathconf wrapper for _PC_SYNC_IO: synchronized I/O may be performed
 const PC_SYNC_IO = _PC_SYNC_IO;
 
-//! Confstr wrapper for _PC_ASYNC_IO
+//! Pathconf wrapper for _PC_ASYNC_IO: asynchronous I/O may be performed
 const PC_ASYNC_IO = _PC_ASYNC_IO;
 
-//! Confstr wrapper for _PC_PRIO_IO
+//! Pathconf wrapper for _PC_PRIO_IO: prioritized I/O may be performed
 const PC_PRIO_IO = _PC_PRIO_IO;
 
-//! Confstr wrapper for _PC_SOCK_MAXBUF
+//! Pathconf wrapper for _PC_SOCK_MAXBUF: maximum socket buffer size
 const PC_SOCK_MAXBUF = _PC_SOCK_MAXBUF;
 
-//! Confstr wrapper for _PC_FILESIZEBITS
+//! Pathconf wrapper for _PC_FILESIZEBITS: minimum bits needed to represent file size
 const PC_FILESIZEBITS = _PC_FILESIZEBITS;
 
-//! Confstr wrapper for _PC_REC_INCR_XFER_SIZE
+//! Pathconf wrapper for _PC_REC_INCR_XFER_SIZE: recommended increment for file transfer sizes
 const PC_REC_INCR_XFER_SIZE = _PC_REC_INCR_XFER_SIZE;
 
-//! Confstr wrapper for _PC_REC_MAX_XFER_SIZE
+//! Pathconf wrapper for _PC_REC_MAX_XFER_SIZE: recommended maximum file transfer size
 const PC_REC_MAX_XFER_SIZE = _PC_REC_MAX_XFER_SIZE;
 
-//! Confstr wrapper for _PC_REC_MIN_XFER_SIZE
+//! Pathconf wrapper for _PC_REC_MIN_XFER_SIZE: recommended minimum file transfer size
 const PC_REC_MIN_XFER_SIZE = _PC_REC_MIN_XFER_SIZE;
 
-//! Confstr wrapper for _PC_REC_XFER_ALIGN
+//! Pathconf wrapper for _PC_REC_XFER_ALIGN: recommended transfer buffer alignment
 const PC_REC_XFER_ALIGN = _PC_REC_XFER_ALIGN;
 
-//! Confstr wrapper for _PC_ALLOC_SIZE_MIN
+//! Pathconf wrapper for _PC_ALLOC_SIZE_MIN: minimum allocation size for a file
 const PC_ALLOC_SIZE_MIN = _PC_ALLOC_SIZE_MIN;
 
-//! Confstr wrapper for _PC_SYMLINK_MAX
+//! Pathconf wrapper for _PC_SYMLINK_MAX: maximum length of a symbolic link
 const PC_SYMLINK_MAX = _PC_SYMLINK_MAX;
 
-//! Confstr wrapper for _PC_2_SYMLINKS
+//! Pathconf wrapper for _PC_2_SYMLINKS: symbolic links are supported
 const PC_2_SYMLINKS = _PC_2_SYMLINKS;
 ///@}
 
