@@ -78,17 +78,15 @@ void init_confstr_constants(QoreNamespace& ns);
 void init_pathconf_constants(QoreNamespace& ns);
 void init_sysconf_constants(QoreNamespace& ns);
 
-QoreStringNode * sysconf_module_init() {
+static void sysconf_module_init(QoreModuleInitContext& ctx, ExceptionSink& xsink) {
     init_sysconf_functions(SysconfNS);
 
     init_confstr_constants(ConfstrNS);
     init_pathconf_constants(PathconfNS);
     init_sysconf_constants(SysconfNS);
-
-    return nullptr;
 }
 
-void sysconf_module_ns_init(QoreNamespace *rns, QoreNamespace *qns) {
+static void sysconf_module_ns_init(QoreNamespace* rns, QoreNamespace* qns, ExceptionSink& xsink) {
     qns->addNamespace(SysconfNS.copy());
     qns->addNamespace(ConfstrNS.copy());
     qns->addNamespace(PathconfNS.copy());
@@ -98,18 +96,20 @@ void sysconf_module_delete() {
    // nothing to do here in this case
 }
 
-// qore module symbols
-DLLEXPORT char qore_module_name[] = "sysconf";
-DLLEXPORT char qore_module_version[] = PACKAGE_VERSION;
-DLLEXPORT char qore_module_description[] = "Sysconf library wrapper";
-DLLEXPORT char qore_module_author[] = "Petr Vanek";
-DLLEXPORT char qore_module_url[] = "http://qore.org";
-DLLEXPORT int qore_module_api_major = QORE_MODULE_API_MAJOR;
-DLLEXPORT int qore_module_api_minor = QORE_MODULE_API_MINOR;
-DLLEXPORT qore_module_init_t qore_module_init = sysconf_module_init;
-DLLEXPORT qore_module_ns_init_t qore_module_ns_init = sysconf_module_ns_init;
-DLLEXPORT qore_module_delete_t qore_module_delete = sysconf_module_delete;
-DLLEXPORT qore_license_t qore_module_license = QL_LGPL;
+extern "C" DLLEXPORT void sysconf_qore_module_desc(QoreModuleInfo& mod_info) {
+    mod_info.name = "sysconf";
+    mod_info.version = PACKAGE_VERSION;
+    mod_info.desc = "Sysconf library wrapper";
+    mod_info.author = "Petr Vanek";
+    mod_info.url = "http://qore.org";
+    mod_info.api_major = QORE_MODULE_API_MAJOR;
+    mod_info.api_minor = QORE_MODULE_API_MINOR;
+    mod_info.init = sysconf_module_init;
+    mod_info.ns_init = sysconf_module_ns_init;
+    mod_info.del = sysconf_module_delete;
+    mod_info.license = QL_LGPL;
+    mod_info.license_str = "LGPL";
+}
 
 /** @defgroup sysconf_functions Sysconf Functions
  */
