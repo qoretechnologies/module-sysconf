@@ -16,9 +16,11 @@ class SysconfTest inherits QUnit::Test {
         addTestCase("sysconf error test", \sysconfErrorTest());
         addTestCase("sysconf_constants helper test", \sysconfConstantsHelperTest());
         addTestCase("confstr basic test", \confstrBasicTest());
+        addTestCase("named argument calls", \namedArgumentTest());
         addTestCase("confstr error test", \confstrErrorTest());
         addTestCase("confstr_constants helper test", \confstrConstantsHelperTest());
         addTestCase("pathconf basic test", \pathconfBasicTest());
+        addTestCase("pathconf sandbox test", \pathconfSandboxTest());
         addTestCase("pathconf multiple constants test", \pathconfMultipleConstantsTest());
         addTestCase("pathconf error test", \pathconfErrorTest());
         addTestCase("pathconf_constants helper test", \pathconfConstantsHelperTest());
@@ -88,6 +90,18 @@ class SysconfTest inherits QUnit::Test {
         assertTrue(path.size() >= 0, "CS_PATH should return a string (may be empty on some systems)");
     }
 
+    namedArgumentTest() {
+        int cpus = sysconf(name: Sysconf::SC_NPROCESSORS_ONLN);
+        assertGe(1, cpus, "named sysconf name");
+
+        string path = confstr(name: Confstr::CS_PATH);
+        assertEq(Type::String, path.type(), "named confstr name");
+
+        string script_path = get_script_path();
+        int name_max = pathconf(path: script_path, name: Pathconf::PC_NAME_MAX);
+        assertGt(0, name_max, "named pathconf path and name");
+    }
+
     confstrErrorTest() {
         # Test with invalid parameter - should throw CONFSTR-ERROR
         assertThrows("CONFSTR-ERROR", sub() { confstr(-99999); });
@@ -114,6 +128,30 @@ class SysconfTest inherits QUnit::Test {
         # Test getting maximum path length
         int path_max = pathconf(test_path, Pathconf::PC_PATH_MAX);
         assertTrue(path_max >= -1, "PC_PATH_MAX should return valid value or -1");
+    }
+
+    pathconfSandboxTest() {
+        Program p(PO_NO_CHILD_PO_RESTRICTIONS);
+        p.parse("
+%modern
+%requires sysconf
+int sub pathconfDenied(string path) {
+    return pathconf(path, Pathconf::PC_NAME_MAX);
+}
+        ", "sysconf_pathconf_sandbox_test");
+
+        SandboxManager sm();
+        sm.setFilesystemDefaultPolicy(False);
+        p.setSandboxManager(sm);
+
+        bool caught = False;
+        try {
+            p.callFunction("pathconfDenied", get_script_path());
+        } catch (hash<ExceptionInfo> ex) {
+            caught = True;
+            assertEq("FILESYSTEM-ACCESS-DENIED", ex.err, "sandbox blocks pathconf read access");
+        }
+        assertTrue(caught, "pathconf should be sandbox checked");
     }
 
     pathconfMultipleConstantsTest() {
