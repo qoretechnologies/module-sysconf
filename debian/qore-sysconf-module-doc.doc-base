@@ -1,0 +1,9 @@
+Document: qore-sysconf-module
+Title: Qore Sysconf Module Reference
+Author: Qore Technologies, s.r.o.
+Abstract: API reference for querying system parameters and file system limits.
+Section: Programming
+
+Format: HTML
+Index: /usr/share/doc/qore-sysconf-module-doc/html/index.html
+Files: /usr/share/doc/qore-sysconf-module-doc/html/*.html

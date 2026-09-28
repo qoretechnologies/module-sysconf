@@ -4,3 +4,13 @@
 # ignore	cmake builds
 build/
 build-*/
+
+# Debian package build output
+obj-*/
+debian/.debhelper/
+debian/debhelper-build-stamp
+debian/files
+debian/*.substvars
+debian/qore-sysconf-module/
+debian/qore-sysconf-module-doc/
+debian/tmp/

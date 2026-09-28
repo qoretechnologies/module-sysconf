@@ -1,0 +1,6 @@
+qore-sysconf-module (1.1.0+git20260928.1-0qore1~ubuntu26.04) resolute; urgency=medium
+
+  * Package the native module, compiler metadata, docs and debug symbols.
+  * Check the upstream suite and installed runtime and compiler integration.
+
+ -- David Nichols <david@qore.org>  Mon, 28 Sep 2026 20:44:48 -0000

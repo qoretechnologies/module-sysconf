@@ -1,0 +1,36 @@
+Source: qore-sysconf-module
+Section: interpreters
+Priority: optional
+Maintainer: David Nichols <david@qore.org>
+Build-Depends: debhelper-compat (= 13),
+               cmake (>= 3.5),
+               libqore-dev (>= 3.0.0~),
+               qore (>= 3.0.0~)
+Build-Depends-Indep: doxygen <!nodoc>
+Standards-Version: 4.7.4
+Rules-Requires-Root: no
+Homepage: https://qore.org
+Vcs-Git: https://github.com/qoretechnologies/module-sysconf.git
+Vcs-Browser: https://github.com/qoretechnologies/module-sysconf
+
+Package: qore-sysconf-module
+Architecture: any
+Depends: ${qore:Depends},
+         ${shlibs:Depends},
+         ${misc:Depends}
+Suggests: qore-sysconf-module-doc
+Description: system configuration queries for Qore
+ This module queries system-wide runtime parameters, string configuration
+ values and file system limits through sysconf, confstr and pathconf.
+ Compiler metadata is included for Qore's tools.
+
+Package: qore-sysconf-module-doc
+Section: doc
+Architecture: all
+Multi-Arch: foreign
+Build-Profiles: <!nodoc>
+Depends: ${misc:Depends}
+Suggests: qore-sysconf-module
+Description: documentation and examples for Qore's sysconf module
+ This package contains the HTML API reference and example tests for Qore's
+ system configuration module.
