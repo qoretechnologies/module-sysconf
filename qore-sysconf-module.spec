@@ -1,76 +1,85 @@
-%define module_api %(qore --latest-module-api 2>/dev/null)
-%define module_dir %{_libdir}/qore-modules
-
-%if 0%{?sles_version}
-
-%define dist .sles%{?sles_version}
-
+# Copyright (C) 2026 Qore Technologies, s.r.o.
+# SPDX-License-Identifier: MIT
+# Use the pinned source epoch for RPM headers and installed file timestamps.
+%global source_date_epoch_from_changelog 1
+%global use_source_date_epoch_as_buildtime 1
+%if v"%{rpmversion}" >= v"4.20"
+%global build_mtime_policy clamp_to_source_date_epoch
 %else
-%if 0%{?suse_version}
-
-# get *suse release major version
-%define os_maj %(echo %suse_version|rev|cut -b3-|rev)
-# get *suse release minor version without trailing zeros
-%define os_min %(echo %suse_version|rev|cut -b-2|rev|sed s/0*$//)
-
-%if %suse_version
-%define dist .opensuse%{os_maj}_%{os_min}
+%global clamp_mtime_to_source_date_epoch 1
 %endif
-
-%endif
-%endif
-
-# see if we can determine the distribution type
-%if 0%{!?dist:1}
-%define rh_dist %(if [ -f /etc/redhat-release ];then cat /etc/redhat-release|sed "s/[^0-9.]*//"|cut -f1 -d.;fi)
-%if 0%{?rh_dist}
-%define dist .rhel%{rh_dist}
-%else
-%define dist .unknown
-%endif
-%endif
-
-Summary: Sysconf module for Qore
+%bcond_without tests
+%bcond_without docs
 Name: qore-sysconf-module
 Version: 1.1.0
-Release: 1%{dist}
-License: MIT
-Group: Development/Languages/Other
-URL: http://qore.org
-Source: http://prdownloads.sourceforge.net/qore/%{name}-%{version}.tar.bz2
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
+Release: 2%{?dist}
+Summary: POSIX system configuration queries for Qore
+License: LGPL-2.1-or-later
+URL: https://github.com/qoretechnologies/module-sysconf
+Source0: %{name}-%{version}.tar.xz
+BuildRequires: cmake >= 3.5
+BuildRequires: make
 BuildRequires: gcc-c++
-BuildRequires: qore-devel >= 1.12.4
-BuildRequires: qore-stdlib >= 1.12.4
-BuildRequires: qore >= 1.12.4
-BuildRequires: cmake
+BuildRequires: qore-devel >= 3.0.0~
+BuildRequires: qore-rpm-macros >= 3.0.0~
+%if %{with docs}
 BuildRequires: doxygen
+BuildRequires: /usr/bin/hardlink
+%endif
 
 %description
-Sysconf glibc wrapper for Qore programming language
+Native Qore interfaces for querying POSIX system configuration values,
+filesystem limits and system configuration strings.
+
+%if %{with docs}
+%package doc
+Summary: Sysconf module reference documentation
+BuildArch: noarch
+%description doc
+API reference and examples for Qore's system configuration module.
+%endif
 
 %prep
-%setup -q
-
+%autosetup
 %build
-export CXXFLAGS="%{?optflags}"
-cmake -DCMAKE_INSTALL_PREFIX=%{_prefix} -DCMAKE_BUILD_TYPE=RELWITHDEBINFO -DCMAKE_SKIP_RPATH=1 -DCMAKE_SKIP_INSTALL_RPATH=1 -DCMAKE_SKIP_BUILD_RPATH=1 -DCMAKE_PREFIX_PATH=${_prefix}/lib64/cmake/Qore .
-%{__make}
-%{__make} docs
-sed -i 's/#!\/usr\/bin\/env qore/#!\/usr\/bin\/qore/' test/*.qtest
-
+%{?set_build_flags}
+. %{_rpmconfigdir}/qore/module-env.sh
+qore_set_source_prefix_maps "%{qore_debug_source_dir}"
+cmake -S . -B build -G 'Unix Makefiles' \
+  -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS_RELEASE=-DNDEBUG \
+  -DCMAKE_INSTALL_PREFIX=%{_prefix} -DCMAKE_INSTALL_LIBDIR=%{_lib} \
+  -DCMAKE_SKIP_RPATH=ON -DCMAKE_IGNORE_PREFIX_PATH=/usr/local \
+  -DQore_DIR=%{_libdir}/cmake/Qore -DQORE_EXECUTABLE=/usr/bin/qore \
+  -DQORE_QPP_EXECUTABLE=/usr/bin/qpp \
+  -DCMAKE_DISABLE_FIND_PACKAGE_Doxygen=%{!?with_docs:ON}%{?with_docs:OFF}
+cmake --build build -- %{?_smp_mflags}
+%if %{with docs}
+cmake --build build --target docs -- %{?_smp_mflags}
+%endif
 %install
-make DESTDIR=%{buildroot} install
-
-%files
-%{module_dir}
-
+DESTDIR=%{buildroot} cmake --install build
+chmod 755 %{buildroot}%{_libdir}/qore-modules/sysconf-api-*.qmod
+%if %{with docs}
+install -d %{buildroot}%{_docdir}/%{name}-doc
+cp -a build/docs/sysconf/html %{buildroot}%{_docdir}/%{name}-doc/
+hardlink -t -O %{buildroot}%{_docdir}/%{name}-doc
+%endif
 %check
-qore -l ./sysconf-api-1.3.qmod test/sysconf.qtest -v
-
+%if %{with tests}
+. %{_rpmconfigdir}/qore/module-env.sh
+/usr/bin/qore -b --enable-debug -l "$PWD/build/sysconf-api-$(/usr/bin/qore --latest-module-api).qmod" test/sysconf.qtest -v
+%endif
+%files
+%license COPYING
+%doc README
+%{_libdir}/qore-modules/sysconf-api-*.qmod
+%dir %{_datadir}/qore/metadata/sysconf
+%{_datadir}/qore/metadata/sysconf/*.meta.json
+%if %{with docs}
+%files doc
+%license COPYING
+%doc %{_docdir}/%{name}-doc/
+%endif
 %changelog
-* Mon Dec 19 2022 David Nichols <david@qore.org> 1.1
-- updated to v1.1.0
-
-* Wed Oct 26 2011 Petr Vanek <petr.vanek@qoretechnologies.com> 1.0.0
-- initial package for Version 1.0.0
+* Thu Oct 01 2026 David Nichols <david@qore.org> - 1.1.0-2
+- Use the packaged SDK, generated ABI requirements and offline module tests.
