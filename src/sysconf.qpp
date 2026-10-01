@@ -3,7 +3,7 @@
 
     Qore Programming Language
 
-    Copyright 2012 - 2022 Qore Technologies
+    Copyright 2012 - 2026 Qore Technologies
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -28,11 +28,11 @@
 /** @mainpage %Qore %Sysconf Module
 
     Contents of this documentation:
-    - @ref intro
-    - @ref functions
-    - @ref constants
+    - @ref sysconfintro
+    - @ref sysconf_functions_overview
+    - @ref sysconf_constants_overview
 
-    @section intro Introduction
+    @section sysconfintro Introduction
 
     The sysconf module provides Qore the possibility to obtain runtime system infomation from the underlying operating system.
     The functionality is provided by standard C library.
@@ -50,11 +50,11 @@
     printf("Count of CPUs: %N\n", sysconf(Sysconf::SC_NPROCESSORS_ONLN));
     @endcode
 
-    @section functions Functions
+    @section sysconf_functions_overview Functions
 
     @see @ref sysconf_functions
 
-    @section constants Constants
+    @section sysconf_constants_overview Constants
 
     @see
     - @ref sysconf_constants
