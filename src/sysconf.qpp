@@ -24,6 +24,7 @@
 #include <qore/QoreSandboxManager.h>
 #include <errno.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 /** @mainpage %Qore %Sysconf Module
 
@@ -62,6 +63,12 @@
     - @ref confstr_constants
 
     @section sysconfreleasenotes sysconf Module Release Notes
+
+    @subsection sysconf_1_1_1 sysconf Module Version 1.1.1
+    - @ref Qore::Sysconf::pathconf() "pathconf()" raises \c PATHCONF-ERROR for a path that does not exist or cannot
+      be reached on every platform; with musl (Alpine) it returned the limits for any path
+    - @ref Qore::Sysconf::pathconf() "pathconf()" follows the system policy in a system-policy capability
+      (\c SandboxManager::createSystemPolicyCall()) instead of the policy of its sandboxed caller
 
     @subsection sysconf_1_1_0 sysconf Module Version 1.1.0
     - fixed @ref confstr_constants to work with @ref Qore::Sysconf::confstr() "confstr()"
@@ -197,12 +204,21 @@ hash<string, int> confstr_constants() [flags=CONSTANT] {
     @param name The parameter argument should be one of the @ref pathconf_constants
     @return The normal return value from pathconf is the value you requested. A value of -1 is returned both if the implementation does not impose a limit.
 
-    @throw PATHCONF-ERROR
+    @throw PATHCONF-ERROR the path does not exist or cannot be reached (on every platform), or the name is invalid
  */
 int pathconf(string path, int name) [flags=RET_VALUE_ONLY,NAMED_ARGS] {
 #ifdef HAVE_PATHCONF
     QoreSandboxManagerHelper smh(QoreSandboxManagerHelper::Policy);
     if (smh && !smh->checkFilesystemAccess(path->getBuffer(), QSEC_READ, xsink)) {
+        return 0;
+    }
+
+    // the path must exist and be reachable on every libc: musl's pathconf() returns its limits without looking at
+    // the path, where glibc's fails with ENOENT, EACCES and so on
+    struct stat st;
+    if (stat(path->getBuffer(), &st)) {
+        xsink->raiseErrnoException("PATHCONF-ERROR", errno, "pathconf(%d) failed: cannot access %s", name,
+            path->getBuffer());
         return 0;
     }
 

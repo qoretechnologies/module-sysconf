@@ -4,7 +4,7 @@ project(qore-sysconf-module)
 
 set (VERSION_MAJOR 1)
 set (VERSION_MINOR 1)
-set (VERSION_PATCH 0)
+set (VERSION_PATCH 1)
 
 # where to look first for cmake modules, before ${CMAKE_ROOT}/Modules/ is checked
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
