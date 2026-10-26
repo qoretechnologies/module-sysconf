@@ -201,7 +201,7 @@ hash<string, int> confstr_constants() [flags=CONSTANT] {
  */
 int pathconf(string path, int name) [flags=RET_VALUE_ONLY,NAMED_ARGS] {
 #ifdef HAVE_PATHCONF
-    QoreSandboxManagerHelper smh;
+    QoreSandboxManagerHelper smh(QoreSandboxManagerHelper::Policy);
     if (smh && !smh->checkFilesystemAccess(path->getBuffer(), QSEC_READ, xsink)) {
         return 0;
     }

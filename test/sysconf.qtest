@@ -138,6 +138,9 @@ class SysconfTest inherits QUnit::Test {
 int sub pathconfDenied(string path) {
     return pathconf(path, Pathconf::PC_NAME_MAX);
 }
+int sub pathconfThrough(code c) {
+    return c();
+}
         ", "sysconf_pathconf_sandbox_test");
 
         SandboxManager sm();
@@ -152,6 +155,18 @@ int sub pathconfDenied(string path) {
             assertEq("FILESYSTEM-ACCESS-DENIED", ex.err, "sandbox blocks pathconf read access");
         }
         assertTrue(caught, "pathconf should be sandbox checked");
+
+        # a system-policy capability called from the sandbox is subject to the system policy, not the sandbox's
+        string path = get_script_path();
+        code capability = SandboxManager::createSystemPolicyCall(int sub () {
+            return pathconf(path, Pathconf::PC_NAME_MAX);
+        });
+        assertGt(0, p.callFunction("pathconfThrough", capability),
+            "pathconf runs in a system-policy capability called from the sandbox");
+        # the same code called directly from the sandbox inherits the sandbox's policy
+        assertThrows("FILESYSTEM-ACCESS-DENIED", \p.callFunction(), ("pathconfThrough", int sub () {
+            return pathconf(path, Pathconf::PC_NAME_MAX);
+        }));
     }
 
     pathconfMultipleConstantsTest() {
