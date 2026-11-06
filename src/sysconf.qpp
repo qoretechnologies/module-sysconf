@@ -136,7 +136,7 @@ int sysconf(int name) [flags=RET_VALUE_ONLY,NAMED_ARGS] {
     int ret = sysconf(name);
 
     if (errno != 0) {
-        xsink->raiseErrnoException("SYSCONF-ERROR", errno, "sysconf(%d) failed", name);
+        xsink->raiseErrnoException("SYSCONF-ERROR", errno, "sysconf(" QLLD ") failed", name);
         return 0;
     }
 
@@ -168,7 +168,7 @@ string confstr(int name) [flags=RET_VALUE_ONLY,NAMED_ARGS] {
     errno = 0;
     size_t len = confstr(name, NULL, 0);
     if (!len || errno != 0) {
-        xsink->raiseErrnoException("CONFSTR-ERROR", errno, "confstr(%d) failed", name);
+        xsink->raiseErrnoException("CONFSTR-ERROR", errno, "confstr(" QLLD ") failed", name);
         return 0;
     }
 
@@ -178,7 +178,7 @@ string confstr(int name) [flags=RET_VALUE_ONLY,NAMED_ARGS] {
     // theoretically there should be no error here, but just in case we have additional error handling
     errno = 0;
     if (!confstr(name, (char*)rv->getBuffer(), len) || errno) {
-        xsink->raiseErrnoException("CONFSTR-ERROR", errno, "confstr(%d) failed", name);
+        xsink->raiseErrnoException("CONFSTR-ERROR", errno, "confstr(" QLLD ") failed", name);
         return 0;
     }
     // len includes null terminator, so actual string length is len - 1
@@ -217,7 +217,7 @@ int pathconf(string path, int name) [flags=RET_VALUE_ONLY,NAMED_ARGS] {
     // the path, where glibc's fails with ENOENT, EACCES and so on
     struct stat st;
     if (stat(path->getBuffer(), &st)) {
-        xsink->raiseErrnoException("PATHCONF-ERROR", errno, "pathconf(%d) failed: cannot access %s", name,
+        xsink->raiseErrnoException("PATHCONF-ERROR", errno, "pathconf(" QLLD ") failed: cannot access %s", name,
             path->getBuffer());
         return 0;
     }
@@ -226,7 +226,7 @@ int pathconf(string path, int name) [flags=RET_VALUE_ONLY,NAMED_ARGS] {
     int ret = pathconf(path->getBuffer(), name);
 
     if (errno != 0) {
-        xsink->raiseErrnoException("PATHCONF-ERROR", errno, "pathconf(%d) failed", name);
+        xsink->raiseErrnoException("PATHCONF-ERROR", errno, "pathconf(" QLLD ") failed", name);
         return 0;
     }
 
