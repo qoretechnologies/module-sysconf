@@ -101,7 +101,18 @@ static void sysconf_module_ns_init(QoreNamespace* rns, QoreNamespace* qns, Excep
 }
 
 void sysconf_module_delete() {
-   // nothing to do here in this case
+    // the Qore::Sysconf namespace is registered with QoreModuleInfo::ns and purged by the library after this
+    // function, before the types are freed; the Pathconf and Confstr namespaces are released here, as only one
+    // namespace can be registered
+    ExceptionSink xsink;
+#ifdef QORE_HAS_MODULE_NS_PURGE
+    PathconfNS.purge(&xsink);
+    ConfstrNS.purge(&xsink);
+#else
+    SysconfNS.clear(&xsink);
+    PathconfNS.clear(&xsink);
+    ConfstrNS.clear(&xsink);
+#endif
 }
 
 extern "C" DLLEXPORT void sysconf_qore_module_desc(QoreModuleInfo& mod_info) {
@@ -115,6 +126,10 @@ extern "C" DLLEXPORT void sysconf_qore_module_desc(QoreModuleInfo& mod_info) {
     mod_info.init = sysconf_module_init;
     mod_info.ns_init = sysconf_module_ns_init;
     mod_info.del = sysconf_module_delete;
+#ifdef QORE_HAS_MODULE_NS_PURGE
+    // the namespace is purged when the module is deleted, before the types are freed (see QoreModuleInfo::ns)
+    mod_info.ns = &SysconfNS;
+#endif
     mod_info.license = QL_LGPL;
     mod_info.license_str = "LGPL";
 }
