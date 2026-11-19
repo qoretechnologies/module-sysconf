@@ -31,7 +31,7 @@ Build Instructions
 ------------------
 
 Requirements:
- - Qore 1.12.4+ development environment (lib and headers)
+ - Qore 3.0+ development environment (lib and headers)
  - CMake 2.8.12+
  - C++11 compatible compiler
  - (optional) Doxygen for documentation

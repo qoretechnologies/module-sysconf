@@ -28,27 +28,24 @@
 
 /** @mainpage %Qore %Sysconf Module
 
-    Contents of this documentation:
-    - @ref sysconfintro
-    - @ref sysconf_functions_overview
-    - @ref sysconf_constants_overview
+    @tableofcontents
+    @section sysconfintro sysconf Module Introduction
 
-    @section sysconfintro Introduction
-
-    The sysconf module provides Qore the possibility to obtain runtime system infomation from the underlying operating system.
-    The functionality is provided by standard C library.
+    Query operating-system limits and configuration values through the standard C library.
 
     This module is released under the <a href="http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html">LGPL 2.1</a>
     and is tagged as such in the module's header (meaning it can be loaded unconditionally regardless of how
-    the %Qore library was initialized). This version of the module requires Qore 1.12.4+ to compile and run.
+    the %Qore library was initialized). This version of the module requires Qore 3.0+ to compile and run.
 
     To use the module in a %Qore script, use the \c %%requires directive as follows:
-    @code %requires sysconf @endcode
-
-    Short example;
-    @code
+    @code{.py}
     %requires sysconf
-    printf("Count of CPUs: %N\n", sysconf(Sysconf::SC_NPROCESSORS_ONLN));
+    @endcode
+
+    To read the number of online processors:
+    @code{.py}
+    %requires sysconf
+    printf("Count of CPUs: %d\n", Sysconf::sysconf(Sysconf::SC_NPROCESSORS_ONLN));
     @endcode
 
     @section sysconf_functions_overview Functions
@@ -62,20 +59,7 @@
     - @ref pathconf_constants
     - @ref confstr_constants
 
-    @section sysconfreleasenotes sysconf Module Release Notes
-
-    @subsection sysconf_1_1_1 sysconf Module Version 1.1.1
-    - @ref Qore::Sysconf::pathconf() "pathconf()" raises \c PATHCONF-ERROR for a path that does not exist or cannot
-      be reached on every platform; with musl (Alpine) it returned the limits for any path
-    - @ref Qore::Sysconf::pathconf() "pathconf()" follows the system policy in a system-policy capability
-      (\c SandboxManager::createSystemPolicyCall()) instead of the policy of its sandboxed caller
-
-    @subsection sysconf_1_1_0 sysconf Module Version 1.1.0
-    - fixed @ref confstr_constants to work with @ref Qore::Sysconf::confstr() "confstr()"
-    - updated to build with \c qpp from %Qore 1.12.4+
-
-    @subsection sysconf_1_0_0 sysconf Module Version 1.0.0
-    - initial release
+    @subpage sysconfreleasenotes
 */
 static QoreNamespace SysconfNS("Sysconf");
 static QoreNamespace PathconfNS("Pathconf");

@@ -1,0 +1,17 @@
+/* Copyright (C) 2026 Qore Technologies, s.r.o. */
+
+/** @page sysconfreleasenotes sysconf Module Release Notes
+
+    @section sysconf_1_1_1 sysconf Module Version 1.1.1
+    - @ref Qore::Sysconf::pathconf() "pathconf()" raises \c PATHCONF-ERROR for a path that does not exist or cannot
+      be reached on every platform; with musl (Alpine) it returned the limits for any path
+    - @ref Qore::Sysconf::pathconf() "pathconf()" follows the system policy in a system-policy capability
+      (\c SandboxManager::createSystemPolicyCall()) instead of the policy of its sandboxed caller
+
+    @section sysconf_1_1_0 sysconf Module Version 1.1.0
+    - fixed @ref confstr_constants to work with @ref Qore::Sysconf::confstr() "confstr()"
+    - updated to build with \c qpp from %Qore 1.12.4+
+
+    @section sysconf_1_0_0 sysconf Module Version 1.0.0
+    - initial release
+*/

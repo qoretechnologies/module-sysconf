@@ -52,6 +52,8 @@ set(QPP_SRC
 
 qore_wrap_qpp_value(QPP_SOURCES METALIST QPP_META_SRC ${QPP_SRC})
 
+set(QORE_DOX_TMPL_SRC docs/release-notes.doxygen.tmpl)
+
 SET (module_name "sysconf")
 
 add_library(${module_name} MODULE ${CPP_SRC} ${QPP_SOURCES})
